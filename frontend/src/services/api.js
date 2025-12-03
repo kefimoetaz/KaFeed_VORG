@@ -38,6 +38,8 @@ export const postAPI = {
   getUserPosts: (userId) => API.get(`/posts/user/${userId}`),
   delete: (id) => API.delete(`/posts/${id}`),
   like: (id) => API.post(`/posts/${id}/like`),
+  react: (id, reactionType) => API.post(`/posts/${id}/react`, { reactionType }),
+  removeReaction: (id) => API.delete(`/posts/${id}/react`),
   repost: (id, data) => API.post(`/posts/${id}/repost`, data)
 };
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getFeed, getExploreFeed, getUserPosts, deletePost, likePost, repostPost } from '../controllers/postControllerLocal.js';
+import { createPost, getFeed, getExploreFeed, getUserPosts, deletePost, likePost, repostPost, reactToPost, removeReaction } from '../controllers/postController.js';
 import { protect } from '../middleware/auth.js';
 import { upload } from '../middleware/upload.js';
 
@@ -11,6 +11,8 @@ router.get('/explore', protect, getExploreFeed);
 router.get('/user/:userId', protect, getUserPosts);
 router.delete('/:id', protect, deletePost);
 router.post('/:id/like', protect, likePost);
+router.post('/:id/react', protect, reactToPost);
+router.delete('/:id/react', protect, removeReaction);
 router.post('/:id/repost', protect, repostPost);
 
 export default router;

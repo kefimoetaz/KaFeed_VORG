@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, MessageCircle, Users, Image, Compass, Settings, PlusCircle } from 'lucide-react';
+import { Home, MessageCircle, Users, Image, Compass, Settings, PlusCircle, Menu, X } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import { messageAPI } from '../services/api';
 
@@ -8,6 +8,7 @@ const Sidebar = () => {
   const { user } = useContext(AuthContext);
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchUnreadCount();
@@ -34,12 +35,32 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-64 p-6 bg-white/80 backdrop-blur-lg border-r border-gray-100">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          Kafeed
-        </h1>
-      </div>
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-full bg-white shadow-lg"
+      >
+        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={`fixed left-0 top-0 h-screen w-64 p-6 bg-white/95 backdrop-blur-lg border-r border-gray-100 z-40 transition-transform duration-300 ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Kafeed
+          </h1>
+        </div>
 
       <Link to={`/profile/${user._id}`} className="group flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 mb-6 hover:shadow-xl hover:scale-105 transition-all duration-300 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-100/0 via-purple-100/50 to-purple-100/0 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
@@ -65,7 +86,10 @@ const Sidebar = () => {
             <Link
               key={item.path}
               to={item.path}
-              onClick={() => sessionStorage.setItem('isNavigating', 'true')}
+              onClick={() => {
+                sessionStorage.setItem('isNavigating', 'true');
+                setIsMobileMenuOpen(false);
+              }}
               className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
             >
               <Icon size={20} />
@@ -80,11 +104,42 @@ const Sidebar = () => {
         })}
       </nav>
 
-      <Link to="/create" className="btn-primary w-full mt-6 text-center flex items-center justify-center gap-2 group">
+      <Link 
+        to="/create" 
+        onClick={() => setIsMobileMenuOpen(false)}
+        className="btn-primary w-full mt-6 text-center flex items-center justify-center gap-2 group"
+      >
         <PlusCircle size={20} className="group-hover:rotate-90 transition-transform duration-300" />
         <span>Create Post</span>
       </Link>
     </div>
+
+    {/* Mobile Bottom Navigation */}
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
+      <div className="flex justify-around items-center py-2">
+        {menuItems.slice(0, 5).map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => sessionStorage.setItem('isNavigating', 'true')}
+              className={`flex flex-col items-center gap-1 p-2 relative ${
+                location.pathname === item.path ? 'text-purple-600' : 'text-gray-600'
+              }`}
+            >
+              <Icon size={22} />
+              {item.badge > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {item.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+    </>
   );
 };
 

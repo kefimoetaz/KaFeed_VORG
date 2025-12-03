@@ -106,3 +106,94 @@ export const likePost = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const reactToPost = async (req, res) => {
+  try {
+    const { reactionType } = req.body; // 'like', 'love', 'laugh', 'wow', 'sad', 'angry'
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Remove existing reaction from this user
+    post.reactions = post.reactions.filter(
+      r => r.userId.toString() !== req.userId
+    );
+
+    // Add new reaction
+    post.reactions.push({
+      userId: req.userId,
+      type: reactionType
+    });
+
+    // Also update likes array for backward compatibility
+    if (!post.likes.includes(req.userId)) {
+      post.likes.push(req.userId);
+    }
+
+    await post.save();
+    
+    const populatedPost = await Post.findById(post._id)
+      .populate('userId', 'username profilePictureURL')
+      .populate('reactions.userId', 'username profilePictureURL');
+    
+    res.json(populatedPost);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const removeReaction = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Remove reaction
+    post.reactions = post.reactions.filter(
+      r => r.userId.toString() !== req.userId
+    );
+
+    // Remove from likes array
+    post.likes = post.likes.filter(id => id.toString() !== req.userId);
+
+    await post.save();
+    
+    const populatedPost = await Post.findById(post._id)
+      .populate('userId', 'username profilePictureURL')
+      .populate('reactions.userId', 'username profilePictureURL');
+    
+    res.json(populatedPost);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const repostPost = async (req, res) => {
+  try {
+    const originalPost = await Post.findById(req.params.id);
+    
+    if (!originalPost) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    const repost = await Post.create({
+      userId: req.userId,
+      text: req.body.text || originalPost.text,
+      imageURL: originalPost.imageURL,
+      originalPostId: originalPost._id,
+      originalUserId: originalPost.userId
+    });
+
+    const populatedRepost = await Post.findById(repost._id)
+      .populate('userId', 'username profilePictureURL')
+      .populate('originalUserId', 'username profilePictureURL');
+    
+    res.status(201).json(populatedRepost);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

@@ -84,7 +84,7 @@ const RightSidebar = () => {
 
   return (
     <>
-    <div className="fixed right-0 top-0 h-screen w-80 p-6 overflow-y-auto">
+    <div className="hidden xl:block fixed right-0 top-0 h-screen w-80 p-6 overflow-y-auto bg-gray-50">
       {/* Stories */}
       <div className="card p-4 mb-6">
         <h3 className="font-bold text-gray-800 mb-4">Stories</h3>

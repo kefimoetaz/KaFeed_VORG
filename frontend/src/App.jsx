@@ -48,11 +48,11 @@ function App() {
               path="/*"
               element={
                 <PrivateRoute>
-                  <div className="min-h-screen">
+                  <div className="min-h-screen bg-gray-50">
                     <Sidebar />
                     <Navbar />
                     <RightSidebar />
-                    <main className="ml-64 mr-80 pt-20 px-8 pb-8">
+                    <main className="lg:ml-64 xl:mr-80 pt-16 lg:pt-20 px-4 lg:px-8 pb-20 lg:pb-8">
                       <Routes>
                         <Route path="/" element={<Feed />} />
                         <Route path="/create" element={<CreatePost />} />
