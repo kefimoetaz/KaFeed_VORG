@@ -27,7 +27,6 @@ A modern, feature-rich social networking application with **premium UX**, **mobi
 ## ✨ Features
 
 ### 🎉 Social Interactions
-- **6 Reaction Types** - Like, Love, Laugh, Wow, Sad, Angry (like Facebook)
 - **@Mentions** - Tag users in posts and comments
 - **#Hashtags** - Organize and discover content
 - **Comments** - Threaded discussions
